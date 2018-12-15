@@ -359,10 +359,14 @@ public class AudioPlayer: NSObject {
     ///
     /// - Parameter active: A boolean value indicating whether the audio session should be set to active or not.
     func setAudioSession(active: Bool) {
-        #if os(iOS) || os(tvOS)
-            _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        if #available(iOS 10.0, *) {
+            #if os(iOS) || os(tvOS)
+            _ = try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
             _ = try? AVAudioSession.sharedInstance().setActive(active)
-        #endif
+            #endif
+        } else {
+            AVAudioSession.sharedInstance().perform(NSSelectorFromString("setCategory:withOptions:error:"), with: AVAudioSession.Category.playback, with:  [])
+        }
     }
 
     // MARK: Public computed properties
